@@ -2,6 +2,7 @@ import os
 import time
 from enum import IntEnum
 
+# Habit dictionaries
 daily_good_habits_dictionary = {
     "get up early": "Start your day early, which enhances productivity",
     "brush teeth": "Maintains good hygiene",
@@ -50,10 +51,7 @@ destructive_habits = {
     "boasting about every achievement": "Can come across as arrogant",
 }
 
-import os
-import time
-from enum import IntEnum
-
+# Helper functions
 def reading_numbered_keys(dictionary):
     for i, key in enumerate(dictionary.keys()):
         print(f' {i+1} --> {key}')
@@ -82,13 +80,20 @@ def read_habits_and_feedback_wrapper(read_habits_in_file):
         with open(path, 'r', encoding='UTF-8') as file:
             lines = len(file.readlines())
         print(f"Congratulations, you have recorded {lines} habits.")
-
     return read_habits_in_file_wrapped
 
 def add_habit_to_dictionary(name_of_dictionary):
     key = input("Enter the habit you made today: ")
     name_of_dictionary[key] = input("Enter the effect of the habit on you: ")
     return key
+
+def remove_habit_from_file(path, habit):
+    with open(path, 'r', encoding='UTF-8') as file:
+        lines = file.readlines()
+    with open(path, 'w', encoding='UTF-8') as file:
+        for line in lines:
+            if line.strip("\n") != habit:
+                file.write(line)
 
 # Define the directory and ensure it exists
 dir_path = r'C:\Users\LENOVO\Desktop\Habits\recording_daily_habits\habits'
@@ -153,8 +158,11 @@ while True:
         read_habits_in_file(path)
 
     elif choice == Choice_Menu.Usuń_nawyk:
-        # Add functionality to remove a habit from the file or dictionary
-        pass
+        habit_to_remove = input("Enter the habit you want to remove: ")
+        # Remove habit from good or bad habits
+        remove_habit_from_file(create_file_name("Good_habits_", timestr, dir_path), habit_to_remove)
+        remove_habit_from_file(create_file_name("Bad_habits_", timestr, dir_path), habit_to_remove)
+        print(f"Habit '{habit_to_remove}' removed.")
 
     elif choice == Choice_Menu.Zakończ:
         break

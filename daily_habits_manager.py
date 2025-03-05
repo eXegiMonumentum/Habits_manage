@@ -2,7 +2,7 @@ import os
 import time
 from enum import IntEnum
 
-# Habit dictionaries
+# Słowniki z nawykami
 daily_good_habits_dictionary = {
     "get up early": "Start your day early, which enhances productivity",
     "brush teeth": "Maintains good hygiene",
@@ -36,36 +36,30 @@ legendary_habits_dictionary = {
     "express gratitude for achievements": "Appreciate your journey and progress",
 }
 
-bad_habits = {
-    "eat excessive sugar": "Affects health and energy levels",
-    "overeating": "Leads to sluggishness",
-    "mindless social media surfing": "Wastes time and reduces productivity",
-    "complaining": "Creates a negative atmosphere",
-    "not drinking enough water": "Leads to dehydration and fatigue",
-    "rushing tasks": "Reduces quality of work",
-}
 
-destructive_habits = {
-    "swearing": "Creates a negative impression",
-    "excessive complaining": "Can damage professional relationships",
-    "boasting about every achievement": "Can come across as arrogant",
-}
+# Funkcja do tworzenia folderu 'habits' jeśli nie istnieje
+def create_habits_folder():
+    habits_folder = 'habits'
+    if not os.path.exists(habits_folder):
+        os.makedirs(habits_folder)
+    return habits_folder
 
-# Helper functions
-def reading_numbered_keys(dictionary):
-    for i, key in enumerate(dictionary.keys()):
-        print(f' {i+1} --> {key}')
 
-def create_file_name(type_of_habits, timestr, dir_path):
-    part_of_path = type_of_habits + timestr + ".txt"
-    file_full_path = os.path.join(dir_path, part_of_path)
-    return file_full_path
-
+# Funkcja do zapisania nawyku w pliku
 def open_file_for_safe_habits(path, key):
     with open(path, 'a+', encoding="UTF-8") as file:
         file.write(key)
         file.write('\n')
 
+
+# Funkcja do tworzenia nazwy pliku
+def create_file_name(type_of_habits, timestr, dir_path):
+    part_of_path = type_of_habits + timestr + ".txt"
+    file_full_path = os.path.join(dir_path, part_of_path)
+    return file_full_path
+
+
+# Funkcja do wyświetlania nawyków
 def read_habits_in_file(path):
     with open(path, 'r', encoding="UTF-8") as file:
         if "Good" in path:
@@ -74,44 +68,61 @@ def read_habits_in_file(path):
             print("\n", "BAD HABITS")
         print(file.read())
 
-def read_habits_and_feedback_wrapper(read_habits_in_file):
-    def read_habits_in_file_wrapped(path):
-        read_habits_in_file(path)
-        with open(path, 'r', encoding='UTF-8') as file:
-            lines = len(file.readlines())
-        print(f"Congratulations, you have recorded {lines} habits.")
-    return read_habits_in_file_wrapped
 
+# Funkcja do dodawania nawyku do słownika
 def add_habit_to_dictionary(name_of_dictionary):
     key = input("Enter the habit you made today: ")
     name_of_dictionary[key] = input("Enter the effect of the habit on you: ")
     return key
 
-def remove_habit_from_file(path, habit):
-    with open(path, 'r', encoding='UTF-8') as file:
-        lines = file.readlines()
-    with open(path, 'w', encoding='UTF-8') as file:
-        for line in lines:
-            if line.strip("\n") != habit:
-                file.write(line)
 
-# Define the directory and ensure it exists
-dir_path = r'C:\Users\LENOVO\Desktop\Habits\recording_daily_habits\habits'
-if not os.path.exists(dir_path):
-    os.makedirs(dir_path)
+# Funkcja do usuwania nawyku z pliku
+def remove_habit_from_file(path, habit):
+    try:
+        with open(path, 'r', encoding="UTF-8") as file:
+            lines = file.readlines()
+
+        # Otwórz plik ponownie do zapisu i przekaż tylko te linie, które nie zawierają nawyku
+        with open(path, 'w', encoding="UTF-8") as file:
+            for line in lines:
+                if habit not in line:  # Pomijaj linie, które zawierają nawyk
+                    file.write(line)
+        print(f"'{habit}' has been removed from the file.")
+    except FileNotFoundError:
+        print("File not found. Nothing to remove.")
+
+
+# Funkcja do usuwania nawyku ze słownika
+def remove_habit_from_dictionary(habit, type_of_habit):
+    if type_of_habit == "Good":
+        if habit in good_habits_dict:
+            del good_habits_dict[habit]
+            print(f"'{habit}' has been removed from good habits.")
+        else:
+            print(f"'{habit}' not found in good habits.")
+    elif type_of_habit == "Bad":
+        if habit in bad_habits_dict:
+            del bad_habits_dict[habit]
+            print(f"'{habit}' has been removed from bad habits.")
+        else:
+            print(f"'{habit}' not found in bad habits.")
+
 
 # Define the current date for the filename
 timestr = time.strftime("%Y_%m_%d")
 
-# Choice Menu
-Choice_Menu = IntEnum('Choice_Menu', ['Dobre_Nawyki', 'Złe_Nawyki', 'Lista_Pomocnicza', 'Wyświetl_nawyki', 'Usuń_nawyk', 'Zakończ'])
-
+# Inicjalizacja słowników nawyków
 good_habits_dict = {}
 bad_habits_dict = {}
 
-# Wrapper setup
-read_habits_in_file_wrapped = read_habits_and_feedback_wrapper(read_habits_in_file)
+# Tworzymy folder na nawyki
+habits_folder = create_habits_folder()
 
+# Menu wyboru
+Choice_Menu = IntEnum('Choice_Menu',
+                      ['Good_Habits', 'Bad_Habits', 'Show_List', 'Show_Todays_Habits', 'Remove_Habit', 'Exit'])
+
+# Główna pętla programu
 while True:
     print("""
         Enter what you did today in terms of your habits:
@@ -125,46 +136,67 @@ while True:
 
     choice = int(input("Enter your choice: "))
 
-    if choice == Choice_Menu.Dobre_Nawyki:
+    if choice == Choice_Menu.Good_Habits:
         key = add_habit_to_dictionary(good_habits_dict)
         type_of_habits = "Good_habits_"
-        path = create_file_name(type_of_habits, timestr, dir_path)
+        path = create_file_name(type_of_habits, timestr, habits_folder)
         open_file_for_safe_habits(path, key)
         read_habits_in_file(path)
-        reading_numbered_keys(good_habits_dict)
         print("-" * 30)
-        read_habits_in_file_wrapped(path)
 
-    elif choice == Choice_Menu.Złe_Nawyki:
+    elif choice == Choice_Menu.Bad_Habits:
         key = add_habit_to_dictionary(bad_habits_dict)
         type_of_habits = "Bad_habits_"
-        path = create_file_name(type_of_habits, timestr, dir_path)
+        path = create_file_name(type_of_habits, timestr, habits_folder)
         open_file_for_safe_habits(path, key)
         read_habits_in_file(path)
-        reading_numbered_keys(bad_habits_dict)
+        print("-" * 30)
 
-    elif choice == Choice_Menu.Lista_Pomocnicza:
+    elif choice == Choice_Menu.Show_List:
         print("DAILY GOOD HABITS")
-        reading_numbered_keys(daily_good_habits_dictionary)
+        for habit in daily_good_habits_dictionary:
+            print(f'{habit} - {daily_good_habits_dictionary[habit]}')
 
         print("ELITE HABITS")
-        reading_numbered_keys(elite_habits_dictionary)
+        for habit in elite_habits_dictionary:
+            print(f'{habit} - {elite_habits_dictionary[habit]}')
 
         print("LEGENDARY HABITS")
-        reading_numbered_keys(legendary_habits_dictionary)
+        for habit in legendary_habits_dictionary:
+            print(f'{habit} - {legendary_habits_dictionary[habit]}')
 
-    elif choice == Choice_Menu.Wyświetl_nawyki:
-        path = create_file_name("Good_habits_", timestr, dir_path)  # Example for good habits
+    elif choice == Choice_Menu.Show_Todays_Habits:
+        print("\nToday's Good Habits:")
+        path = create_file_name("Good_habits_", timestr, habits_folder)  # Example for good habits
         read_habits_in_file(path)
+        print("\nToday's Bad Habits:")
+        path = create_file_name("Bad_habits_", timestr, habits_folder)  # Example for bad habits
+        read_habits_in_file(path)
+        print("-" * 30)
 
-    elif choice == Choice_Menu.Usuń_nawyk:
-        habit_to_remove = input("Enter the habit you want to remove: ")
-        # Remove habit from good or bad habits
-        remove_habit_from_file(create_file_name("Good_habits_", timestr, dir_path), habit_to_remove)
-        remove_habit_from_file(create_file_name("Bad_habits_", timestr, dir_path), habit_to_remove)
-        print(f"Habit '{habit_to_remove}' removed.")
+    elif choice == Choice_Menu.Remove_Habit:
+        print("Enter the habit you want to remove:")
+        habit_to_remove = input("Habit name: ")
 
-    elif choice == Choice_Menu.Zakończ:
+        # Wybierz, czy to dobry, czy zły nawyk
+        print("Is this a good habit or a bad habit?")
+        print("Press 1 for Good, 2 for Bad")
+        habit_type = int(input())
+
+        # Usuwanie z odpowiedniego słownika
+        if habit_type == 1:
+            remove_habit_from_dictionary(habit_to_remove, "Good")
+            path = create_file_name("Good_habits_", timestr, habits_folder)
+            remove_habit_from_file(path, habit_to_remove)
+        elif habit_type == 2:
+            remove_habit_from_dictionary(habit_to_remove, "Bad")
+            path = create_file_name("Bad_habits_", timestr, habits_folder)
+            remove_habit_from_file(path, habit_to_remove)
+        else:
+            print("Invalid option.")
+        print("-" * 30)
+
+    elif choice == Choice_Menu.Exit:
         break
 
     else:

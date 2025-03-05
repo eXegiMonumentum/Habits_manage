@@ -1,0 +1,22 @@
+# Ignore Python bytecode files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Ignore virtual environment folder (if any)
+venv/
+env/
+
+# Ignore habits folder (it will contain daily habit files)
+habits/
+
+# Ignore IDE files (e.g., for PyCharm)
+.idea/
+
+# Ignore log files
+*.log
+
+# Ignore system files
+.DS_Store
+Thumbs.db

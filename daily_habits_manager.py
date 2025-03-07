@@ -39,6 +39,12 @@ legendary_habits_dictionary = {
 
 # Funkcja do tworzenia folderu 'habits' jeśli nie istnieje
 def create_habits_folder():
+    """
+    Creates a folder named 'habits' if it doesn't already exist.
+
+    Returns:
+        str: The name of the created or existing folder.
+    """
     habits_folder = 'habits'
     if not os.path.exists(habits_folder):
         os.makedirs(habits_folder)
@@ -47,6 +53,13 @@ def create_habits_folder():
 
 # Funkcja do zapisania nawyku w pliku
 def open_file_for_safe_habits(path, key):
+    """
+    Opens the file at the specified path and appends the provided habit key.
+
+    Args:
+        path (str): The path to the file.
+        key (str): The habit to be added to the file.
+    """
     with open(path, 'a+', encoding="UTF-8") as file:
         file.write(key)
         file.write('\n')
@@ -54,6 +67,17 @@ def open_file_for_safe_habits(path, key):
 
 # Funkcja do tworzenia nazwy pliku
 def create_file_name(type_of_habits, timestr, dir_path):
+    """
+    Creates a file name for habit data based on the habit type, current date, and directory path.
+
+    Args:
+        type_of_habits (str): The type of habits (Good/Bad).
+        timestr (str): The current date in string format.
+        dir_path (str): The directory path where the file will be stored.
+
+    Returns:
+        str: The full path to the file.
+    """
     part_of_path = type_of_habits + timestr + ".txt"
     file_full_path = os.path.join(dir_path, part_of_path)
     return file_full_path
@@ -61,6 +85,12 @@ def create_file_name(type_of_habits, timestr, dir_path):
 
 # Funkcja do wyświetlania nawyków
 def read_habits_in_file(path):
+    """
+    Reads and displays the habits from a file at the given path.
+
+    Args:
+        path (str): The path to the file containing the habits.
+    """
     with open(path, 'r', encoding="UTF-8") as file:
         if "Good" in path:
             print("\n", "GOOD Habits")
@@ -71,6 +101,15 @@ def read_habits_in_file(path):
 
 # Funkcja do dodawania nawyku do słownika
 def add_habit_to_dictionary(name_of_dictionary):
+    """
+    Prompts the user to input a habit and its effect, then adds it to the provided dictionary.
+
+    Args:
+        name_of_dictionary (dict): The dictionary to store the habit.
+
+    Returns:
+        str: The key (habit name) added to the dictionary.
+    """
     key = input("Enter the habit you made today: ")
     name_of_dictionary[key] = input("Enter the effect of the habit on you: ")
     return key
@@ -78,6 +117,13 @@ def add_habit_to_dictionary(name_of_dictionary):
 
 # Funkcja do usuwania nawyku z pliku
 def remove_habit_from_file(path, habit):
+    """
+    Removes a habit from the file at the given path.
+
+    Args:
+        path (str): The path to the file.
+        habit (str): The habit to be removed.
+    """
     try:
         with open(path, 'r', encoding="UTF-8") as file:
             lines = file.readlines()
@@ -94,6 +140,13 @@ def remove_habit_from_file(path, habit):
 
 # Funkcja do usuwania nawyku ze słownika
 def remove_habit_from_dictionary(habit, type_of_habit):
+    """
+    Removes a habit from the specified dictionary (Good or Bad).
+
+    Args:
+        habit (str): The habit to be removed.
+        type_of_habit (str): The type of habit dictionary ("Good" or "Bad").
+    """
     if type_of_habit == "Good":
         if habit in good_habits_dict:
             del good_habits_dict[habit]
